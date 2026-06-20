@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Popcorn/Popcorn.vcxproj" Id="b901b117-7d80-4526-9d7d-181e68a60191" />
+</Solution>
