@@ -25,20 +25,7 @@ ALevel::ALevel()
 {
 }
 //**************************************************************************************************************
-void ALevel::Init()
-{
-	Letter_Pen = CreatePen(PS_SOLID, AsConfig::Global_Scale, RGB(255, 255, 255));
-
-	AsConfig::Create_Pen_Brush(AsConfig::Red_Brick_Color, Brick_Red_Pen, Brick_Red_Brush);
-	AsConfig::Create_Pen_Brush(AsConfig::Blue_Brick_Color, Brick_Blue_Pen, Brick_Blue_Brush);
-
-	Level_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
-	Level_Rect.top = AsConfig::Level_Y_Offset * AsConfig::Global_Scale;
-	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width * AsConfig::Global_Scale;
-	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height * AsConfig::Global_Scale;
-}
-//**************************************************************************************************************
-void ALevel::Check_Level_Brick_Hit(double &next_y_pos, double &ball_direction)
+bool ALevel::Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {// Корректируем позицию при отражении от кирпичей
 
 	int i, j;
@@ -53,13 +40,28 @@ void ALevel::Check_Level_Brick_Hit(double &next_y_pos, double &ball_direction)
 
 			if (next_y_pos < brick_y_pos)
 			{
-				next_y_pos = brick_y_pos - (next_y_pos - brick_y_pos);
-				ball_direction = -ball_direction;
+				ball->Ball_Direction = -ball->Ball_Direction;
+				return true;
 			}
 		}
 
 		brick_y_pos -= AsConfig::Cell_Height;
 	}
+
+	return false;
+}
+//**************************************************************************************************************
+void ALevel::Init()
+{
+	Letter_Pen = CreatePen(PS_SOLID, AsConfig::Global_Scale, RGB(255, 255, 255));
+
+	AsConfig::Create_Pen_Brush(AsConfig::Red_Brick_Color, Brick_Red_Pen, Brick_Red_Brush);
+	AsConfig::Create_Pen_Brush(AsConfig::Blue_Brick_Color, Brick_Blue_Pen, Brick_Blue_Brush);
+
+	Level_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
+	Level_Rect.top = AsConfig::Level_Y_Offset * AsConfig::Global_Scale;
+	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width * AsConfig::Global_Scale;
+	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height * AsConfig::Global_Scale;
 }
 //**************************************************************************************************************
 void ALevel::Draw(HDC hdc, RECT &paint_area)
@@ -150,7 +152,7 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, EL
 	if (rotation_step < 8)
 		rotation_angle = 2.0 * M_PI / 16.0 * (double)rotation_step;
 	else
-		rotation_angle = 2.0 * M_PI / 16.0 * (double)(8L - (long long)rotation_step);
+		rotation_angle = 2.0 * M_PI / 16.0 * (double)(8 - rotation_step);
 
 	if (rotation_step > 4 && rotation_step <= 12)
 	{

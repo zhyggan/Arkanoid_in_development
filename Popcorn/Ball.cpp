@@ -3,6 +3,8 @@
 // ABall
 const double ABall::Start_Ball_Y_Pos = 181.0;
 const double ABall::Radius = 2.0;
+int ABall::Hit_Checkers_Count = 0;
+AHit_Checker *ABall::Hit_Checkers[] = {};
 //**************************************************************************************************************
 ABall::ABall()
 	: Ball_State(EBS_Normal), Ball_Pen(0), Ball_Brush(0), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0), Ball_Direction(0.0), 
@@ -39,8 +41,9 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	}
 }
 //**************************************************************************************************************
-void ABall::Move(int platform_x_pos, int platform_width, ALevel *level, AHit_Checker *hit_checker)
+void ABall::Move()
 {
+	int i;
 	bool got_hit;
 	double next_x_pos, next_y_pos;
 	int platform_y_pos = AsConfig::Platform_Y_Pos - AsConfig::Ball_Size;
@@ -54,23 +57,21 @@ void ABall::Move(int platform_x_pos, int platform_width, ALevel *level, AHit_Che
 
 	while (Rest_Distance >= step_size)
 	{
+		got_hit = false;
+
 		next_x_pos = Center_X_Pos + (step_size * cos(Ball_Direction));
 		next_y_pos = Center_Y_Pos - (step_size * sin(Ball_Direction)); // Инвертируем  (ставим знак минус после Ball_Y_Pos) синус чтобы изменить тригонометрию с компьтерной на человеческую
 
-		got_hit = hit_checker->Сheck_Hit(next_x_pos, next_y_pos, this);
+		// Корректируем позицию при отражении:
+		for (i = 0; i < Hit_Checkers_Count; i++)
+			got_hit |= Hit_Checkers[i]->Сheck_Hit(next_x_pos, next_y_pos, this);
 
-		//// Корректируем позицию при отражении от платформы
-		//if (next_y_pos > platform_y_pos)
-		//{
-		//	if (next_x_pos >= platform_x_pos && next_x_pos <= (double)(platform_x_pos + platform_width) )
-		//	{
-		//		next_y_pos = platform_y_pos - (next_y_pos - platform_y_pos);
-		//		Ball_Direction = -Ball_Direction;
-		//	}
-		//}
+		// ^^^^^
+		//// Корректируем позицию при отражении:
+		//got_hit |= border_hit_checker->Сheck_Hit(next_x_pos, next_y_pos, this); // от рамки 
+		//got_hit |= level_hit_checker->Сheck_Hit(next_x_pos, next_y_pos, this);  // от кирпичей
+		//got_hit |= platform_hit_checker->Сheck_Hit(next_x_pos, next_y_pos, this);  // от платформы
 
-		//// Корректируем позицию при отражении от кирпичей
-		//level->Check_Level_Brick_Hit(next_y_pos, Ball_Direction);
 
 		if (! got_hit)
 		{
@@ -120,6 +121,14 @@ void ABall::Set_State(EBall_State new_state, double x_pos)
 	}
 
 	Ball_State = new_state;
+}
+//**************************************************************************************************************
+void ABall::Add_Hit_Checkers(AHit_Checker *hit_checker)
+{
+	if (Hit_Checkers_Count >= sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]) )
+		return;
+
+	Hit_Checkers[Hit_Checkers_Count++] = hit_checker;
 }
 //**************************************************************************************************************
 void ABall::Redraw_Ball()
