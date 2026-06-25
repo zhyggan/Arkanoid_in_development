@@ -38,10 +38,11 @@ public:
 	void Move();
 	EBall_State Get_State();
 	void Set_State(EBall_State new_state, double x_pos);
+	double Get_Direction();
+	void Set_Direction(double new_direction);
+	void Reflect(bool from_horizontal);
 
-	double Ball_Direction;
-
-	static void Add_Hit_Checkers(AHit_Checker *hit_checker);
+	static void Add_Hit_Checker(AHit_Checker *hit_checker);
 
 	static const double Radius;
 
@@ -53,6 +54,7 @@ private:
 	HBRUSH Ball_Brush;
 	double Ball_Speed;
 	double Rest_Distance;
+	double Ball_Direction;
 
 	double Center_X_Pos, Center_Y_Pos;
 

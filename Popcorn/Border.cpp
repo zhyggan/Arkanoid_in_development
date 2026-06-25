@@ -15,19 +15,19 @@ bool AsBorder::Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	if (next_x_pos - ball->Radius < AsConfig::Border_X_Offset)
 	{
 		got_hit = true;
-		ball->Ball_Direction = M_PI - ball->Ball_Direction; // Формула для отражения угла с 1-й в 2-ю и с 3-й в 4-ю четверть окружности (справа <-> налево), а также наоборот, нахрест M_PI + Ball_Direction
+		ball->Reflect(false); // Формула для отражения угла с 1-й в 2-ю и с 3-й в 4-ю четверть окружности (справа <-> налево), а также наоборот, нахрест M_PI + Ball_Direction
 	}
 
 	if (next_y_pos - ball->Radius < AsConfig::Border_Y_Offset)
 	{
 		got_hit = true;
-		ball->Ball_Direction = -ball->Ball_Direction; // Формула для отражения угла с 1-й в 4-ю и с 2-й в 3-ю четверть окружности (сверху <-> вниз), а также наоборот
+		ball->Reflect(true); // Формула для отражения угла с 1-й в 4-ю и с 2-й в 3-ю четверть окружности (сверху <-> вниз), а также наоборот
 	}
 
 	if (next_x_pos + ball->Radius > AsConfig::Max_X_Pos)
 	{
 		got_hit = true;
-		ball->Ball_Direction = M_PI - ball->Ball_Direction;
+		ball->Reflect(false);
 	}
 
 	if (next_y_pos + ball->Radius > AsConfig::Max_Y_Pos)
@@ -35,7 +35,7 @@ bool AsBorder::Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 		if (AsConfig::Level_Has_Floor)
 		{
 			got_hit = true;
-			ball->Ball_Direction = -ball->Ball_Direction;
+			ball->Reflect(true);
 		}
 		else
 		{

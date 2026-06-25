@@ -19,9 +19,9 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Ball.Init();
 	Border.Init();
 
-	ABall::Add_Hit_Checkers(&Border);
-	ABall::Add_Hit_Checkers(&Level);
-	ABall::Add_Hit_Checkers(&Platform);
+	ABall::Add_Hit_Checker(&Border);
+	ABall::Add_Hit_Checker(&Level);
+	ABall::Add_Hit_Checker(&Platform);
 
 	Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
 

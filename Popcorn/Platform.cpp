@@ -12,12 +12,11 @@ AsPlatform::AsPlatform()
 //**************************************************************************************************************
 bool AsPlatform::Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
-
 	if (next_y_pos + ball->Radius > AsConfig::Platform_Y_Pos)
 		{
 			if (next_x_pos + ball->Radius >= X_Pos && next_x_pos - ball->Radius <= (double)(X_Pos + Width) )
 			{
-				ball->Ball_Direction = -ball->Ball_Direction;
+				ball->Reflect(true);
 				return true;
 			}
 		}
@@ -53,7 +52,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 {
 	int i, len;
 
-	if(Platform_State == new_state)
+	if (Platform_State == new_state)
 		return;
 
 	switch (new_state)
