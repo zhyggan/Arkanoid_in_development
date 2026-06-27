@@ -108,24 +108,6 @@ bool ALevel::Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 						ball->Reflect(true);
 						return true;
 					}
-
-
-			/*if (Is_Check_Horizontal_First(next_x_pos, next_y_pos) )
-			{
-				if (Check_Vertical_Hit(next_x_pos, next_y_pos, j, i, ball) )
-					return true;
-
-				if (Check_Horizontal_Hit(next_x_pos, next_y_pos, j, i, ball) )
-					return true;
-			}
-			else
-			{
-				if (Check_Vertical_Hit(next_x_pos, next_y_pos, j, i, ball) )
-					return true;
-
-				if (Check_Horizontal_Hit(next_x_pos, next_y_pos, j, i, ball) )
-					return true;
-			}*/
 		}
 	}
 
@@ -168,28 +150,6 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 	//Active_Brick.Draw(hdc, paint_area);
 }
 //**************************************************************************************************************
-//bool ALevel::Is_Check_Horizontal_First(double next_x_pos, double next_y_pos)
-//{
-//	double min_distance_to_horizontal, min_distance_to_vertical, another_min_distance;
-//
-//	min_distance_to_horizontal = fabs(next_x_pos - Current_Brick_Left_X);
-//	another_min_distance = fabs(next_x_pos - Current_Brick_Right_X);
-//
-//	if (another_min_distance < min_distance_to_horizontal)
-//		min_distance_to_horizontal = another_min_distance;
-//
-//	min_distance_to_vertical = fabs(next_y_pos - Current_Brick_Top_Y);
-//	another_min_distance = fabs(next_x_pos - Current_Brick_Low_Y);
-//
-//	if (another_min_distance < min_distance_to_vertical)
-//		min_distance_to_vertical = another_min_distance;
-//
-//	if (min_distance_to_horizontal <= min_distance_to_vertical)
-//		return true;
-//	else
-//		return false;
-//}
-//**************************************************************************************************************
 bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
 {
 	double direction = ball->Get_Direction();
@@ -201,7 +161,6 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 			// Проверяем возможность отскока вниз
 			if (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0)
 			{
-				//ball->Reflect(true);
 				return true;
 			}
 			else
@@ -215,7 +174,6 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 			// Проверяем возможность отскока вверх
 			if (level_y > 0 && Current_Level[level_y - 1][level_x] == 0)
 			{
-				//ball->Reflect(true);
 				return true;
 			}
 			else
@@ -236,7 +194,6 @@ bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int leve
 			// Проверяем возможность отскока влево
 			if (level_x > 0 && Current_Level[level_y][level_x - 1] == 0)
 			{
-				//ball->Reflect(false);
 				return true;
 			}
 			else
@@ -250,7 +207,6 @@ bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int leve
 			// Проверяем возможность отскока влево
 			if (level_x < AsConfig::Level_Width - 1 && Current_Level[level_y][level_x + 1] == 0)
 			{
-				//ball->Reflect(false);
 				return true;
 			}
 			else
