@@ -16,6 +16,8 @@ enum EKey_Type
 //**************************************************************************************************************
 enum EGame_State
 {
+	EGS_Test_Ball,
+
 	EGS_Play_Level,
 	EGS_Lost_Ball,
 	EGS_Restart_Level

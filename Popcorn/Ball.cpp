@@ -8,9 +8,9 @@ AHit_Checker *ABall::Hit_Checkers[] = {};
 //**************************************************************************************************************
 ABall::ABall()
 	: Ball_State(EBS_Normal), Ball_Pen(0), Ball_Brush(0), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0), 
-	  Rest_Distance(0.0), Ball_Direction(0.0), Ball_Rect{}, Prev_Ball_Rect{}
+	  Rest_Distance(0.0), Ball_Direction(0.0), Testing_Is_Active(false), Test_Itertation(0), Ball_Rect{}, Prev_Ball_Rect{}
 {
-	Set_State(EBS_Normal, 0);
+	//Set_State(EBS_Normal, 0);
 }
 //**************************************************************************************************************
 void ABall::Init()
@@ -30,6 +30,9 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 
 		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
 	}
+
+	if (Ball_State == EBS_Lost)
+		return;
 
 	//2. Рисуем шарик
 	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect) )
@@ -79,10 +82,39 @@ void ABall::Move()
 
 			Center_X_Pos = next_x_pos;
 			Center_Y_Pos = next_y_pos;
+
+			if (Testing_Is_Active)
+				Rest_Test_Distance -= step_size;
 		}
 	}
 
 	Redraw_Ball();
+}
+//**************************************************************************************************************
+void ABall::Set_For_Test()
+{
+	Testing_Is_Active = true;
+	Rest_Test_Distance = 30.0;
+
+	Set_State(EBS_Normal, 93 + Test_Itertation, 70);
+	Ball_Direction = M_PI + M_PI_4;
+
+	++Test_Itertation;
+}
+//**************************************************************************************************************
+bool ABall::Is_Test_Finished()
+{
+	if (Testing_Is_Active)
+	{
+		if (Rest_Test_Distance <= 0.0)
+		{
+			Testing_Is_Active = false;
+			Set_State(EBS_Lost, 0);
+			return true;
+		}
+	}
+	
+	return false;
 }
 //**************************************************************************************************************
 EBall_State ABall::Get_State()
@@ -90,13 +122,15 @@ EBall_State ABall::Get_State()
 	return Ball_State;
 }
 //**************************************************************************************************************
-void ABall::Set_State(EBall_State new_state, double x_pos)
+void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos) // если в функции параметру присваивается значение, 
+																								 // то в такую ф-ю можно передать два аргумента, а 3-му присвоится заданый
+																		  						 // и записывается присваивание только в заголовочном файле
 {
 	switch (new_state)
 	{
 	case EBS_Normal:
 		Center_X_Pos = x_pos;
-		Center_Y_Pos = Start_Ball_Y_Pos;
+		Center_Y_Pos = y_pos;
 		Ball_Speed = 3.0;
 		Rest_Distance = 0.0;
 		Ball_Direction = M_PI_4;
@@ -111,7 +145,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos)
 
 	case EBS_On_Platform:
 		Center_X_Pos = x_pos;
-		Center_Y_Pos = Start_Ball_Y_Pos;
+		Center_Y_Pos = y_pos;
 		Ball_Speed = 0.0;
 		Rest_Distance = 0.0;
 		Ball_Direction = M_PI_4;
