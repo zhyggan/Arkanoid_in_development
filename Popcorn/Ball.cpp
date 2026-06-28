@@ -1,5 +1,35 @@
 ﻿#include "Ball.h"
 
+// AHit_Checker
+//**************************************************************************************************************
+bool AHit_Checker::Hit_Ball_On_Line(double y, double next_x_pos, double left_x, double right_x, double radius, double &x)
+{// Проверяет пересечение горизонтального отрезка (проходящего от left_x до right_x через y) с окружностью радиусом radius
+
+	double min_x, max_x;
+	// x*x + y*y = R*R
+
+	//y = next_y_pos - brick_y_pos; 
+	// мы делаем этот расчет для того чтобы получить значение, которое потом сравниваем с радиусом, и если это значение меньше чем радиус значит произошло столкновение
+	// потом проверяем чтобы по х лежал в кирпиче и только потом алгоритм отскока 
+
+	if (y > radius)
+		return false;
+
+	x = sqrt(radius * radius - y * y);
+
+	max_x = next_x_pos + x;
+	min_x = next_x_pos - x;
+
+	if (max_x >= left_x && max_x <= right_x  ||  min_x >= left_x && min_x <= right_x)
+		return true;
+	else
+		return false;
+}
+//**************************************************************************************************************
+
+
+
+
 // ABall
 const double ABall::Start_Ball_Y_Pos = 181.0;
 const double ABall::Radius = 2.0;
@@ -65,7 +95,7 @@ void ABall::Move()
 		next_y_pos = Center_Y_Pos - (step_size * sin(Ball_Direction)); // Инвертируем  (ставим знак минус после Ball_Y_Pos) синус чтобы изменить тригонометрию с компьтерной на человеческую
 
 		// Корректируем позицию при отражении:
-		for (i = 0; i < Hit_Checkers_Count; i++)
+	 	for (i = 0; i < Hit_Checkers_Count; i++)
 			got_hit |= Hit_Checkers[i]->Сheck_Hit(next_x_pos, next_y_pos, this);
 
 		// ^^^^^
@@ -180,6 +210,22 @@ void ABall::Reflect(bool from_horizontal)
 		Set_Direction(-Ball_Direction);
 	else
 		Set_Direction(M_PI - Ball_Direction);
+}
+//**************************************************************************************************************
+bool ABall::Is_Moving_Up()
+{
+	if (Ball_Direction >= 0.0 && Ball_Direction < M_PI)
+		return true;
+	else
+		return false;
+}
+//**************************************************************************************************************
+bool ABall::Is_Moving_Left()
+{
+	if (Ball_Direction > M_PI_2 && Ball_Direction < M_PI + M_PI_2)
+		return true;
+	else
+		return false;
 }
 //**************************************************************************************************************
 void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)

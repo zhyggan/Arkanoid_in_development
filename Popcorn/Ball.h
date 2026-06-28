@@ -25,6 +25,7 @@ public:
 	// ИНТЕРФЕЙС помогает скрыть реализацию одного класса от другого, не рекомендуется злоупотреблять интерфейсами т.к. потом вносить изменения очень сложно,
 	// ПРИМЕНЯТЬ ТОЛЬКО ТАМ, ГДЕ НУЖНО РАЗОРВАТЬ ЗАВИСИМОСТЬ ДВУХ КЛАССОВ
 
+	bool Hit_Ball_On_Line(double y, double next_x_pos, double left_x, double right_x, double radius, double &x);
 };
 //**************************************************************************************************************
 class ABall
@@ -45,6 +46,10 @@ public:
 	double Get_Direction();
 	void Set_Direction(double new_direction);
 	void Reflect(bool from_horizontal);
+	bool Is_Moving_Up();
+	bool Is_Moving_Left();
+
+	double Ball_Speed;
 
 	static void Add_Hit_Checker(AHit_Checker *hit_checker);
 
@@ -56,7 +61,6 @@ private:
 	EBall_State Ball_State;
 	HPEN Ball_Pen;
 	HBRUSH Ball_Brush;
-	double Ball_Speed;
 	double Rest_Distance;
 	double Ball_Direction;
 
