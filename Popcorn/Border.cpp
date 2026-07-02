@@ -24,7 +24,7 @@ bool AsBorder::Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 		ball->Reflect(true); // Формула для отражения угла с 1-й в 4-ю и с 2-й в 3-ю четверть окружности (сверху <-> вниз), а также наоборот
 	}
 
-	if (next_x_pos + ball->Radius > AsConfig::Max_X_Pos)
+	if (next_x_pos + ball->Radius > AsConfig::Max_X_Pos + 1)
 	{
 		got_hit = true;
 		ball->Reflect(false);

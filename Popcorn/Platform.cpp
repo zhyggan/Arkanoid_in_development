@@ -15,7 +15,9 @@ bool AsPlatform::Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 
 	double inner_left_x, inner_right_x;
 	double inner_top_y, inner_low_y;
+	double inner_y;
 	double reflection_pos;
+	
 
 	if (next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
 		return false;
@@ -24,28 +26,27 @@ bool AsPlatform::Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	inner_low_y = (double)(AsConfig::Platform_Y_Pos + Height - 1);
 	inner_left_x = (double)(X_Pos + Circle_Size - 1);
 	inner_right_x = (double)(X_Pos + Width - (Circle_Size - 1) );
+
+	if (Reflect_From_Circle(next_x_pos, next_y_pos, 0.0, ball) )
+		return true;
+
+	if (Reflect_From_Circle(next_x_pos, next_y_pos, Width - Circle_Size, ball) )
+		return true;
+
 	
 	// Проверяем попадание в central platform part
 	if ( ball->Is_Moving_Up() )
-	{	
-		// Проверяем попадание в нижнюю грань
-		if (Hit_Ball_On_Line(next_y_pos - inner_low_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
-		{
-			ball->Reflect(true);
-			return true;
-		}
-	}
+		inner_y = inner_low_y;	// Проверяем попадание в нижнюю грань
 	else
+		inner_y = inner_top_y;	// Проверяем попадание в верхнюю грань     
+
+	if (Hit_Ball_On_Line(next_y_pos - inner_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
 	{
-		// Проверяем попадание в верхнюю грань
-		if (Hit_Ball_On_Line(next_y_pos - inner_top_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) )
-		{
 			ball->Reflect(true);
 			return true;
-		}
 	}
 
-	//return false;
+	return false;
 }
 //**************************************************************************************************************
 void AsPlatform::Init()
@@ -329,5 +330,56 @@ void AsPlatform::Draw_Expanding_Roll_In_State(HDC hdc, RECT &paint_area)
 		Platform_State = EPS_Ready;
 		Redraw_Platform();
 	}
+}
+//**************************************************************************************************************
+bool AsPlatform::Reflect_From_Circle(double next_x_pos, double next_y_pos, double platform_circle_x_offset, ABall *ball)
+{
+	double distance, dx, dy;
+	double platform_circle_x, platform_circle_y, platform_circle_radius;
+	double two_radius;
+	double alpha, beta, gamma;
+	double related_ball_direction;
+	const double pi_2 = 2.0 * M_PI;
+
+	platform_circle_radius = (double)Circle_Size / 2.0;
+	platform_circle_x = (double)X_Pos + platform_circle_radius + platform_circle_x_offset;
+	platform_circle_y = (double)AsConfig::Platform_Y_Pos + platform_circle_radius;
+
+	// 1. Reflect from platform circles
+	// 1.1. From left circle
+
+	dx = next_x_pos - platform_circle_x;
+	dy = next_y_pos - platform_circle_y;
+
+	distance = sqrt(dx * dx + dy * dy);
+	two_radius = platform_circle_radius + ball->Radius;
+
+
+	if ( fabs(distance - two_radius) < AsConfig::Moving_Step_Size ) //fabs(distance - two_radius) < AsConfig::Moving_Step_Size   distance <= two_radius
+	{// ball touches platform circle
+
+		beta = atan2(-dy, dx);
+
+		related_ball_direction = ball->Get_Direction();
+		related_ball_direction -= beta;
+
+		if (related_ball_direction > pi_2)
+			related_ball_direction -= pi_2;
+
+		if (related_ball_direction < 0.0)
+			related_ball_direction += pi_2;
+
+		if (related_ball_direction > M_PI_2 && related_ball_direction < M_PI + M_PI_2)
+		{
+			alpha = beta + M_PI - ball->Get_Direction();
+			gamma = beta + alpha;
+
+			ball->Set_Direction(gamma);
+
+			return true;
+		}
+	}
+
+	return false;
 }
 //**************************************************************************************************************

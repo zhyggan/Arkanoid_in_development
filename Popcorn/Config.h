@@ -4,6 +4,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <cmath>
 
 //**************************************************************************************************************
 class AColor
@@ -28,6 +29,8 @@ public:
 	static HPEN BG_Pen;
 	static HBRUSH BG_Brush;
 	static HWND Hwnd;
+
+	static const double Moving_Step_Size;
 
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;
