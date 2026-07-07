@@ -20,6 +20,7 @@ public:
 
 	void Init();
 	void Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width]);
+	void Act();
 	void Draw(HDC hdc, RECT &paint_area);
 
 	//AActive_Brick Active_Brick;
@@ -27,6 +28,7 @@ public:
 	static char Test_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 
 private:
+	void Add_Active_Brick(int brick_x, int brick_y);
 	bool Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos);
 	bool Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos);
 	void Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type);
@@ -41,5 +43,7 @@ private:
 	double Current_Brick_Top_Y, Current_Brick_Low_Y;
 
 	char Current_Level[AsConfig::Level_Height][AsConfig::Level_Width];
+	int Active_Bricks_Count;
+	AActive_Brick *Active_Bricks[AsConfig::Max_Active_Bricks_Count];
 };
 //**************************************************************************************************************
