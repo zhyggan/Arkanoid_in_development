@@ -95,13 +95,13 @@ void ABall::Move()
 
 		// Корректируем позицию при отражении:
 	 	for (i = 0; i < Hit_Checkers_Count; i++)
-			got_hit |= Hit_Checkers[i]->Сheck_Hit(next_x_pos, next_y_pos, this);
+			got_hit |= Hit_Checkers[i]->Check_Hit(next_x_pos, next_y_pos, this);
 
 		// ^^^^^
 		//// Корректируем позицию при отражении:
-		//got_hit |= border_hit_checker->Сheck_Hit(next_x_pos, next_y_pos, this); // от рамки 
-		//got_hit |= level_hit_checker->Сheck_Hit(next_x_pos, next_y_pos, this);  // от кирпичей
-		//got_hit |= platform_hit_checker->Сheck_Hit(next_x_pos, next_y_pos, this);  // от платформы
+		//got_hit |= border_hit_checker->Check_Hit(next_x_pos, next_y_pos, this); // от рамки 
+		//got_hit |= level_hit_checker->Check_Hit(next_x_pos, next_y_pos, this);  // от кирпичей
+		//got_hit |= platform_hit_checker->Check_Hit(next_x_pos, next_y_pos, this);  // от платформы
 
 
 		if (! got_hit)

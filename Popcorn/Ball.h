@@ -14,7 +14,7 @@ class ABall;
 class AHit_Checker
 {
 public:
-	virtual bool Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball) = 0;
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball) = 0;
 	// virtual значит, что метод может быть определен как в базовом классе так и в производном
 	// но если добавить = 0, то это значит, что метода не должно быть в базовом классе, и такой метод обязательно должен присутсвовать в производном классе,
 	// = 0 делает метод абстрактным

@@ -39,15 +39,6 @@ void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 	SetGraphicsMode(hdc, GM_ADVANCED);
 
 	Level.Draw(hdc, paint_area);
-
-	//int i;
-
-	//for (i = 0; i < 16; i++)
-	//{
-	//	Draw_Brick_Letter(hdc, 20 + i * Cell_Width * Global_Scale, 100, EBT_Blue, ELT_O, i);
-	//	Draw_Brick_Letter(hdc, 20 + i * Cell_Width * Global_Scale, 130, EBT_Red, ELT_O, i);
-	//}
-
 	Border.Draw(hdc, paint_area);
 	Platform.Draw(hdc, paint_area);
 	Ball.Draw(hdc, paint_area);

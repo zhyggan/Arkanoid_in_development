@@ -7,7 +7,7 @@ AsBorder::AsBorder()
 {
 }
 //**************************************************************************************************************
-bool AsBorder::Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
 	bool got_hit = false;
 

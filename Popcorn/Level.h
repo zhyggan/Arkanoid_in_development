@@ -41,7 +41,7 @@ class ALevel: public AHit_Checker
 public:
 	ALevel();
 
-	virtual bool Сheck_Hit(double next_x_pos, double next_y_pos, ABall *ball);
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
 
 	void Init();
 	void Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width]);
