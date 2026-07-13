@@ -37,6 +37,9 @@
     <Filter Include="Active_Brick">
       <UniqueIdentifier>{bea2caaf-5e80-48fd-8e4b-4a81b2721a49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Falling_Letter">
+      <UniqueIdentifier>{d6ca1b14-df97-4a56-84ba-041a70401636}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -71,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="Active_Brick.h">
       <Filter>Active_Brick</Filter>
+    </ClInclude>
+    <ClInclude Include="Falling_Letter.h">
+      <Filter>Falling_Letter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +116,9 @@
     </ClCompile>
     <ClCompile Include="Active_Brick.cpp">
       <Filter>Active_Brick</Filter>
+    </ClCompile>
+    <ClCompile Include="Falling_Letter.cpp">
+      <Filter>Falling_Letter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

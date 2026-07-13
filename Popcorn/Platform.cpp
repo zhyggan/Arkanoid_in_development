@@ -158,6 +158,28 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 	}
 }
 //**************************************************************************************************************
+void AsPlatform::Move(bool to_left)
+{
+	if (to_left)
+	{
+		X_Pos -= X_Step;
+
+		if (X_Pos <= AsConfig::Border_X_Offset)
+			X_Pos = AsConfig::Border_X_Offset;
+
+		Redraw_Platform();
+	}
+	else
+	{
+		X_Pos += X_Step;
+
+		if (X_Pos >= AsConfig::Max_X_Pos - Width + 1)
+			X_Pos = AsConfig::Max_X_Pos - Width + 1;
+
+		Redraw_Platform();
+	}
+}
+//**************************************************************************************************************
 void AsPlatform::Clear_BG(HDC hdc)
 {// Очищаем фоном прежнее место
 
@@ -244,7 +266,6 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 	int moved_columns_count = 0;
 	int max_platform_y;
 	HPEN color_pen;
-	COLORREF pixel;
 	COLORREF bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
 
 	max_platform_y = (AsConfig::Max_Y_Pos + 1) * AsConfig::Global_Scale;
