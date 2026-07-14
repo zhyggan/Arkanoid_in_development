@@ -160,6 +160,9 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 //**************************************************************************************************************
 void AsPlatform::Move(bool to_left)
 {
+	if (Platform_State != EPS_Normal)
+		return;
+
 	if (to_left)
 	{
 		X_Pos -= X_Step;
@@ -178,6 +181,18 @@ void AsPlatform::Move(bool to_left)
 
 		Redraw_Platform();
 	}
+}
+//**************************************************************************************************************
+bool AsPlatform::Hit_By(AFalling_Letter *falling_letter)
+{
+	RECT intersection_rect, falling_letter_rect;
+
+	falling_letter->Get_Letter_Cell(falling_letter_rect);
+
+	if (IntersectRect(&intersection_rect, &falling_letter_rect, &Platform_Rect) )
+		return true;
+	else
+		return false;
 }
 //**************************************************************************************************************
 void AsPlatform::Clear_BG(HDC hdc)

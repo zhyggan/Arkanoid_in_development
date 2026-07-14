@@ -10,6 +10,13 @@ enum ELetter_Type
 	ELT_O
 };
 //**************************************************************************************************************
+enum EFalling_Letter_State
+{
+	EFLS_Normal,
+	EFLS_Vanishing,
+	EFLS_Finished
+};
+//**************************************************************************************************************
 class AFalling_Letter: public AGraphics_Object
 {
 public:
@@ -19,14 +26,17 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual bool Is_Finished();
 
+	void Get_Letter_Cell(RECT &rect);
+	void Vanish();
+
 	const EBrick_Type Brick_Type;
 	const ELetter_Type Letter_Type;
-	bool Got_Hit;
 
 private:
 	void Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush);
 	void Draw_Brick_Letter(HDC hdc);
 
+	EFalling_Letter_State Falling_Letter_State;
 	int X, Y;
 	int Rotation_Step;
 	int Next_Rotation_Tick;

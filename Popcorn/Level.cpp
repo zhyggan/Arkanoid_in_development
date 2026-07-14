@@ -1,6 +1,6 @@
 ﻿#include "Level.h"
 
-char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
+char AsLevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -18,7 +18,7 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
+char AsLevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -36,14 +36,14 @@ char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-// ALevel
+// AsLevel
 // //**************************************************************************************************************
-ALevel::ALevel()
+AsLevel::AsLevel()
 : Level_Rect{}, Active_Bricks_Count(0), Falling_Letters_Count(0)
 {
 }
 //**************************************************************************************************************
-bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+bool AsLevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {// Корректируем позицию при отражении от кирпичей
 
 	int i, j;
@@ -117,7 +117,7 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	return false;
 }
 //**************************************************************************************************************
-void ALevel::Init()
+void AsLevel::Init()
 {
 	Level_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
 	Level_Rect.top = AsConfig::Level_Y_Offset * AsConfig::Global_Scale;
@@ -129,18 +129,18 @@ void ALevel::Init()
 	memset(Falling_Letters, 0, sizeof(Falling_Letters) );
 }
 //**************************************************************************************************************
-void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width])
+void AsLevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width])
 {
 	memcpy(Current_Level, level, sizeof(Current_Level) );
 }
 //**************************************************************************************************************
-void ALevel::Act()
+void AsLevel::Act()
 {
 	Act_Objects( (AGraphics_Object **)&Active_Bricks, AsConfig::Max_Active_Bricks_Count);
 	Act_Objects( (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
 }
 //**************************************************************************************************************
-void ALevel::Draw(HDC hdc, RECT &paint_area)
+void AsLevel::Draw(HDC hdc, RECT &paint_area)
 {// Вывод всех кирпичей уровня
 
 	int i, j;
@@ -166,7 +166,31 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 	Draw_Objects(hdc, paint_area, (AGraphics_Object **)&Falling_Letters, AsConfig::Max_Falling_Letters_Count);
 }
 //**************************************************************************************************************
-void ALevel::On_Hit(int brick_x, int brick_y)
+bool AsLevel::Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_letter)
+{
+	AFalling_Letter *current_letter;
+
+	if (Falling_Letters_Count == 0)
+		return false;
+	
+	if (index < 0 || index >= AsConfig::Max_Falling_Letters_Count)
+		return false;
+
+	while (index < AsConfig::Max_Falling_Letters_Count)
+	{
+		current_letter = Falling_Letters[index++];
+
+		if (current_letter != 0)
+		{
+			*falling_letter = current_letter;
+			return true;
+		}
+	}
+
+	return false;
+}
+//**************************************************************************************************************
+void AsLevel::On_Hit(int brick_x, int brick_y)
 {
 	EBrick_Type brick_type;
 
@@ -179,7 +203,7 @@ void ALevel::On_Hit(int brick_x, int brick_y)
 
 }
 //**************************************************************************************************************
-bool ALevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type)
+bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type)
 {// Создаем падающую букву, если можем
 
 	int i;
@@ -214,7 +238,7 @@ bool ALevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type
 	return false;
 }
 //**************************************************************************************************************
-void ALevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
+void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
 {// Создаем активный кирпич, если можем
 
 	int i;
@@ -249,7 +273,7 @@ void ALevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
 	}
 }
 //**************************************************************************************************************
-bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
+bool AsLevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
 {
 
 	if (ball->Is_Moving_Up() )
@@ -280,7 +304,7 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 	return false;
 }
 //**************************************************************************************************************
-bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
+bool AsLevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
 {
 	
 	if (! ball->Is_Moving_Left() )
@@ -311,7 +335,7 @@ bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int leve
 	return false;
 }
 //**************************************************************************************************************
-void ALevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
+void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 {//Вывод кирпича
 
 	HPEN pen;
@@ -344,7 +368,7 @@ void ALevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right - 1, brick_rect.bottom - 1, 2 * AsConfig::Global_Scale, 2 * AsConfig::Global_Scale);
 }
 //**************************************************************************************************************
-void ALevel::Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count)
+void AsLevel::Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array, int objects_max_count)
 {
 	int i;
 
@@ -355,7 +379,7 @@ void ALevel::Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_
 	}
 }
 //**************************************************************************************************************
-void ALevel::Act_Objects(AGraphics_Object **objects_array, int objects_max_count)
+void AsLevel::Act_Objects(AGraphics_Object **objects_array, int objects_max_count)
 {
 	int i;
 

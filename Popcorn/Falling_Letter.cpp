@@ -3,7 +3,7 @@
 // AFalling_Letter
 //**************************************************************************************************************
 AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y)
-	:  Brick_Type(brick_type), Letter_Type(letter_type), Got_Hit(false), X(x), Y(y), Rotation_Step(2), Next_Rotation_Tick(AsConfig::Current_Timer_Tick + Ticks_Per_Step) // И хотя константу менять нельзя, в С++ есть особеность позволяющая задавать значения таким константам в момент создания объекта,
+	:  Brick_Type(brick_type), Letter_Type(letter_type), Falling_Letter_State(EFLS_Normal), X(x), Y(y), Rotation_Step(2), Next_Rotation_Tick(AsConfig::Current_Timer_Tick + Ticks_Per_Step) // И хотя константу менять нельзя, в С++ есть особеность позволяющая задавать значения таким константам в момент создания объекта,
 	// и единствиное место, где можно присвоить константе значение - это только список инициализации в конструкторе такого класса
 {
 	Letter_Cell.left = X;
@@ -16,6 +16,15 @@ AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_typ
 //**************************************************************************************************************
 void AFalling_Letter::Act()
 {
+	if (Falling_Letter_State != EFLS_Normal)
+		return;
+
+	if (Letter_Cell.top >= AsConfig::Max_Y_Pos * AsConfig::Global_Scale) // for invalidate rect if near bottom border
+	{
+		Vanish();
+		return;
+	}
+
 	Prev_Letter_Cell = Letter_Cell;
 
 	Y += AsConfig::Global_Scale;
@@ -44,16 +53,35 @@ void AFalling_Letter::Draw(HDC hdc, RECT &paint_area)
 
 		Rectangle(hdc, Prev_Letter_Cell.left, Prev_Letter_Cell.top, Prev_Letter_Cell.right, Prev_Letter_Cell.bottom);
 	}
+
+	if (Falling_Letter_State == EFLS_Vanishing)
+	{
+		Falling_Letter_State = EFLS_Finished;
+		return;
+	}
+
 	if (IntersectRect(&intersection_rect, &paint_area, &Letter_Cell) )
 		Draw_Brick_Letter(hdc);
 }
 //**************************************************************************************************************
 bool AFalling_Letter::Is_Finished()
 {
-	if (Got_Hit || Letter_Cell.top >= AsConfig::Max_Y_Pos * AsConfig::Global_Scale)
+	if (Falling_Letter_State == EFLS_Finished)
 		return true;
 	else
 		return false;
+}
+//**************************************************************************************************************
+void AFalling_Letter::Get_Letter_Cell(RECT &rect)
+{
+	rect = Letter_Cell;
+}
+//**************************************************************************************************************
+void AFalling_Letter::Vanish()
+{
+	Falling_Letter_State = EFLS_Vanishing;
+	InvalidateRect(AsConfig::Hwnd, &Prev_Letter_Cell, FALSE);
+	InvalidateRect(AsConfig::Hwnd, &Letter_Cell, FALSE);
 }
 //**************************************************************************************************************
 void AFalling_Letter::Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush)
@@ -88,8 +116,8 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	HBRUSH front_brush, back_brush;
 	XFORM xform, old_xform;
 
-	if (!(Brick_Type == EBT_Blue || Brick_Type == EBT_Red))
-		return; // Падающие буквы могут быть только от кирпичей такого типа
+	if (! (Brick_Type == EBT_Blue || Brick_Type == EBT_Red))
+		return;  // Падающие буквы могут быть только от кирпичей такого типа
 
 	//Корректируем шаг вращения и угол поворота
 	Rotation_Step = Rotation_Step % 16;
