@@ -5,9 +5,17 @@
 //**************************************************************************************************************
 enum ELetter_Type
 {
-	ELT_None,
-
-	ELT_O
+	ELT_I, //Inverts the direction of all balls
+	ELT_T, //Makes Three balls from one
+	ELT_S, //Slows down all balls
+	ELT_G, //Sticks the ball on the bat (Glue)
+	ELT_L, //Laser gun
+	ELT_W, //Makes platform wider
+	ELT_F, //Adds a Floor to the levels
+	ELT_H, //Catch this plate to earn a new life(heart)
+	ELT_M, //The Monsters may get frezzed for one minute
+	ELT_C, //Cancels All options. Cancels effects from plates C, L, E, F, S and M. Doesn't affect the multiple balls.
+	ELT_Plus //Opens a short path to the next level
 };
 //**************************************************************************************************************
 enum EFalling_Letter_State
@@ -28,6 +36,7 @@ public:
 
 	void Get_Letter_Cell(RECT &rect);
 	void Vanish();
+	void Test_Draw_All_Steps(HDC hdc);
 
 	const EBrick_Type Brick_Type;
 	const ELetter_Type Letter_Type;
@@ -35,6 +44,8 @@ public:
 private:
 	void Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush);
 	void Draw_Brick_Letter(HDC hdc);
+	void Draw_Line(HDC hdc, int x_1, int y_1, int x_2, int y_2);
+	void Draw_Line_To(HDC hdc, int x, int y);
 
 	EFalling_Letter_State Falling_Letter_State;
 	int X, Y;
@@ -43,5 +54,8 @@ private:
 	RECT Letter_Cell, Prev_Letter_Cell;
 
 	static const int Ticks_Per_Step = 4;
+	static const int Max_Rotation_Step = 16;
+	static const int Brick_Half_Height = AsConfig::Brick_Height * AsConfig::Global_Scale / 2;
+	;
 };
 //**************************************************************************************************************

@@ -3,7 +3,7 @@
 // AsEngine
 //**************************************************************************************************************
 AsEngine::AsEngine()
-: Game_State(EGS_Play_Level)
+: Game_State(EGS_Lost_Ball)
 {
 }
 //**************************************************************************************************************
@@ -33,9 +33,10 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	Level.Set_Current_Level(AsLevel::Level_01);
 
-	Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
+	//Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
 
-	Platform.Set_State(EPS_Normal);
+	//Platform.Set_State(EPS_Normal);
+	
 	Platform.Redraw_Platform();
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);

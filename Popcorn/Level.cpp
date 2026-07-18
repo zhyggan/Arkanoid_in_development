@@ -146,6 +146,9 @@ void AsLevel::Draw(HDC hdc, RECT &paint_area)
 	int i, j;
 	RECT intersection_rect, brick_rect;
 
+	AFalling_Letter falling_letter(EBT_Blue, ELT_G, 8 * AsConfig::Global_Scale, 150 * AsConfig::Global_Scale);
+	falling_letter.Test_Draw_All_Steps(hdc);
+
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect) )
 	{
 		for (i = 0; i < AsConfig::Level_Height; i++)
@@ -210,28 +213,26 @@ bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_typ
 	int letter_x, letter_y;
 	AFalling_Letter *falling_letter;
 
-	if (brick_type == EBT_Blue || brick_type == EBT_Red)
+	if (! (brick_type == EBT_Blue || brick_type == EBT_Red) )
+		return false;
+
+	if (AsConfig::Rand(AsConfig::Hits_Per_Letter) != 0)
+		return false;
+	
+	if (Falling_Letters_Count >= AsConfig::Max_Falling_Letters_Count)
+		return false;
+	
+	for (i = 0; i < AsConfig::Max_Falling_Letters_Count; i++)
 	{
-		if (AsConfig::Rand(AsConfig::Hits_Per_Letter) == 0)
+		if (Falling_Letters[i] == 0)
 		{
-			if (Falling_Letters_Count < AsConfig::Max_Falling_Letters_Count)
-			{
-				for (i = 0; i < AsConfig::Max_Falling_Letters_Count; i++)
-				{
-					if (Falling_Letters[i] == 0)
-					{
-						letter_x = (brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset) * AsConfig::Global_Scale;
-						letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
+			letter_x = (brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset) * AsConfig::Global_Scale;
+			letter_y = (brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset) * AsConfig::Global_Scale;
 
-						falling_letter = new AFalling_Letter(brick_type, ELT_O, letter_x, letter_y);
-						Falling_Letters[i] = falling_letter;
-						++Falling_Letters_Count;
-						break;
-					}
-				}
-
-				return true;
-			}
+			falling_letter = new AFalling_Letter(brick_type, ELT_G, letter_x, letter_y);
+			Falling_Letters[i] = falling_letter;
+			++Falling_Letters_Count;
+			return true;
 		}
 	}
 
