@@ -1,6 +1,8 @@
 #include "Falling_Letter.h"
 
 // AFalling_Letter
+int AFalling_Letter::All_Letters_Popularity;
+int AFalling_Letter::Letters_Popularity[ELT_Max] = { 7, 7, 7, 7, 7, 7, 7,  3, 3, 3,  1 };
 //**************************************************************************************************************
 AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y)
 	:  Brick_Type(brick_type), Letter_Type(letter_type), Falling_Letter_State(EFLS_Normal), X(x), Y(y), Rotation_Step(0), Next_Rotation_Tick(AsConfig::Current_Timer_Tick + Ticks_Per_Step) // И хотя константу менять нельзя, в С++ есть особеность позволяющая задавать значения таким константам в момент создания объекта,
@@ -91,7 +93,7 @@ void AFalling_Letter::Test_Draw_All_Steps(HDC hdc)
 
 	Rotation_Step = 0;
 
-	for (size_t i = 0; i < Max_Rotation_Step; i++)
+	for (i = 0; i < Max_Rotation_Step; i++)
 	{
 		Draw_Brick_Letter(hdc);
 
@@ -102,6 +104,34 @@ void AFalling_Letter::Test_Draw_All_Steps(HDC hdc)
 
 	}
 
+}
+//**************************************************************************************************************
+void AFalling_Letter::Init()
+{
+	int i;
+
+	All_Letters_Popularity = 0;
+
+	for (i = 0; i < ELT_Max; i++)
+		All_Letters_Popularity += Letters_Popularity[i];
+}
+//**************************************************************************************************************
+ELetter_Type AFalling_Letter::Get_Random_Letter_Type()
+{
+	int i;
+	int letters_popularity;
+
+	letters_popularity = AsConfig::Rand(All_Letters_Popularity);
+
+	for (i = 0; i < ELT_Max; i++)
+	{
+		if (letters_popularity < Letters_Popularity[i])
+			return (ELetter_Type)i;
+
+		letters_popularity -= Letters_Popularity[i];
+	}
+
+	return ELT_C;
 }
 //**************************************************************************************************************
 void AFalling_Letter::Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush)
@@ -138,7 +168,7 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	if (! (Brick_Type == EBT_Blue || Brick_Type == EBT_Red))
 		return;  // Падающие буквы могут быть только от кирпичей такого типа
 
-	//Корректируем шаг вращения и угол поворота
+	// Корректируем шаг вращения и угол поворота
 	Rotation_Step = Rotation_Step % Max_Rotation_Step;
 
 	if (Rotation_Step < 8)
@@ -166,13 +196,13 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 
 	if (Rotation_Step == 4 || Rotation_Step == 12)
 	{
-		//Выводим фон
+		// Выводим фон
 		SelectObject(hdc, back_pen);
 		SelectObject(hdc, back_brush);
 
 		Rectangle(hdc, X, Y + Brick_Half_Height - AsConfig::Global_Scale, X + AsConfig::Brick_Width * AsConfig::Global_Scale, Y + Brick_Half_Height);
 
-		//Выводим передний план
+		// Выводим передний план
 		SelectObject(hdc, front_pen);
 		SelectObject(hdc, front_brush);
 
@@ -180,17 +210,17 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 	}
 	else
 	{
-		//Настраиваем матрицу переворота буквы
+		// Настраиваем матрицу переворота буквы
 		xform.eM11 = 1.0f;
 		xform.eM12 = 0.0f;
 		xform.eM21 = 0.0f;
-		xform.eM22 = (float)cos(rotation_angle) ;
+		xform.eM22 = (float)cos(rotation_angle);
 		xform.eDx = (float)X;
 		xform.eDy = (float)Y + (float)(Brick_Half_Height);
 		GetWorldTransform(hdc, &old_xform);
 		SetWorldTransform(hdc, &xform);
 
-		//Выводим фон
+		// Выводим фон
 		SelectObject(hdc, back_pen);
 		SelectObject(hdc, back_brush);
 
@@ -198,7 +228,7 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 		back_part_offset = (int)round(offset);
 		Rectangle(hdc, 0, -Brick_Half_Height - back_part_offset, AsConfig::Brick_Width * AsConfig::Global_Scale - 1, Brick_Half_Height - back_part_offset);
 
-		//Выводим передний план
+		// Выводим передний план
 		SelectObject(hdc, front_pen);
 		SelectObject(hdc, front_brush);
 

@@ -5,17 +5,21 @@
 //**************************************************************************************************************
 enum ELetter_Type
 {
+	ELT_C, //Cancels All options. Cancels effects from plates C, L, E, F, S and M. Doesn't affect the multiple balls.
 	ELT_I, //Inverts the direction of all balls
-	ELT_T, //Makes Three balls from one
 	ELT_S, //Slows down all balls
 	ELT_G, //Sticks the ball on the bat (Glue)
-	ELT_L, //Laser gun
 	ELT_W, //Makes platform wider
-	ELT_F, //Adds a Floor to the levels
 	ELT_H, //Catch this plate to earn a new life(heart)
 	ELT_M, //The Monsters may get frezzed for one minute
-	ELT_C, //Cancels All options. Cancels effects from plates C, L, E, F, S and M. Doesn't affect the multiple balls.
-	ELT_Plus //Opens a short path to the next level
+
+	ELT_T, //Makes Three balls from one
+	ELT_L, //Laser gun
+	ELT_F, //Adds a Floor to the levels
+
+	ELT_Plus, //Opens a short path to the next level
+
+	ELT_Max
 };
 //**************************************************************************************************************
 enum EFalling_Letter_State
@@ -38,6 +42,9 @@ public:
 	void Vanish();
 	void Test_Draw_All_Steps(HDC hdc);
 
+	static void Init();
+	static ELetter_Type Get_Random_Letter_Type();
+
 	const EBrick_Type Brick_Type;
 	const ELetter_Type Letter_Type;
 
@@ -56,6 +63,8 @@ private:
 	static const int Ticks_Per_Step = 4;
 	static const int Max_Rotation_Step = 16;
 	static const int Brick_Half_Height = AsConfig::Brick_Height * AsConfig::Global_Scale / 2;
-	;
+
+	static int All_Letters_Popularity;
+	static int Letters_Popularity[ELT_Max]; // "Вес" каждой буквы
 };
 //**************************************************************************************************************
