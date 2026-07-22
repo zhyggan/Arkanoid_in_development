@@ -17,7 +17,6 @@ public:
 	void Draw(HDC hdc, RECT &paint_area);
 	bool Get_Next_Falling_Letter(int &index, AFalling_Letter **falling_letter);
 
-	//AActive_Brick Active_Brick;
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
 	static char Test_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 
