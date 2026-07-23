@@ -10,9 +10,8 @@ AsPlatform::~AsPlatform()
 AsPlatform::AsPlatform()
 : X_Pos(AsConfig::Border_X_Offset), X_Step(AsConfig::Global_Scale * 2), Platform_State(EPS_Missing), Inner_Width(Normal_Platform_Inner_Width),
   Rolling_Step(0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0), Normal_Platform_Image(0),
-  Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Pen(0), Platform_Circle_Pen(0),
-  Platform_Inner_Pen(0), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Highlight_Pen_Color(255, 255, 255),
-  Platform_Circle_Pen_Color(151, 0, 0), Platform_Inner_Pen_Color(0, 128, 192)
+  Width(Normal_Width), Platform_Rect{}, Prev_Platform_Rect{}, Highlight_Color(255, 255, 255),
+  Platform_Circle_Color(151, 0, 0), Platform_Inner_Color(0, 128, 192)
 {
 	X_Pos = (AsConfig::Max_X_Pos - Width) / 2;
 }
@@ -54,14 +53,6 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	}
 
 	return false;
-}
-//**************************************************************************************************************
-void AsPlatform::Init()
-{
-	Highlight_Pen = CreatePen(PS_SOLID, 0, Highlight_Pen_Color.Get_RGB() );
-
-	AsConfig::Create_Pen_Brush(Platform_Circle_Pen_Color, Platform_Circle_Pen, Platform_Circle_Brush);
-	AsConfig::Create_Pen_Brush(Platform_Inner_Pen_Color, Platform_Inner_Pen, Platform_Inner_Brush);
 }
 //**************************************************************************************************************
 void AsPlatform::Act()
@@ -199,9 +190,7 @@ bool AsPlatform::Hit_By(AFalling_Letter *falling_letter)
 void AsPlatform::Clear_BG(HDC hdc)
 {// Очищаем фоном прежнее место
 
-	SelectObject(hdc, AsConfig::BG_Pen);
-	SelectObject(hdc, AsConfig::BG_Brush);
-
+	AsConfig::BG_Color.Select(hdc);
 	Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.top, Prev_Platform_Rect.right, Prev_Platform_Rect.bottom);
 }
 //**************************************************************************************************************
@@ -211,7 +200,7 @@ void AsPlatform::Draw_Circle_Highlight(HDC hdc, int x, int y, bool is_roll_in)
 
 	if (is_roll_in == true)
 	{
-		SelectObject(hdc, Highlight_Pen);
+		SelectObject(hdc, Highlight_Color.Pen);
 
 		Arc(hdc, x + AsConfig::Global_Scale, y + AsConfig::Global_Scale, x + (Circle_Size - 1) * AsConfig::Global_Scale - 1, y + (Circle_Size - 1) * AsConfig::Global_Scale - 1,
 			x + 2 * AsConfig::Global_Scale, y + AsConfig::Global_Scale, x + AsConfig::Global_Scale, y + 3 * AsConfig::Global_Scale);
@@ -220,7 +209,7 @@ void AsPlatform::Draw_Circle_Highlight(HDC hdc, int x, int y, bool is_roll_in)
 	}
 	else
 	{
-		SelectObject(hdc, Highlight_Pen);
+		SelectObject(hdc, Highlight_Color.Pen);
 
 		Arc(hdc, x + AsConfig::Global_Scale, y + AsConfig::Global_Scale, x + (Circle_Size - 1) * AsConfig::Global_Scale - 1, y + (Circle_Size - 1) * AsConfig::Global_Scale - 1,
 			x + 2 * AsConfig::Global_Scale, y + AsConfig::Global_Scale, x + AsConfig::Global_Scale, y + 3 * AsConfig::Global_Scale);
@@ -241,8 +230,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	Clear_BG(hdc);
 
 	// 1. Рисуем боковые шарики
-	SelectObject(hdc, Platform_Circle_Pen);
-	SelectObject(hdc, Platform_Circle_Brush);
+	Platform_Circle_Color.Select(hdc);
 
 	Ellipse(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + Circle_Size) * AsConfig::Global_Scale - 1, (y + Circle_Size) * AsConfig::Global_Scale - 1);
 	Ellipse(hdc, (x + Inner_Width) * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + Circle_Size + Inner_Width) * AsConfig::Global_Scale - 1, (y + Circle_Size) * AsConfig::Global_Scale - 1);
@@ -251,8 +239,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	Draw_Circle_Highlight(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, false);
 
 	// 3. Рисуем среднюю часть
-	SelectObject(hdc, Platform_Inner_Pen);
-	SelectObject(hdc, Platform_Inner_Brush);
+	Platform_Inner_Color.Select(hdc);
 
 	RoundRect(hdc, (x + 4) * AsConfig::Global_Scale, (y + 1) * AsConfig::Global_Scale, (x + 4 + Inner_Width - 1) * AsConfig::Global_Scale - 1, (y + 1 + 5) * AsConfig::Global_Scale - 1, 3 * AsConfig::Global_Scale, 3 * AsConfig::Global_Scale);
 
@@ -281,8 +268,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 	int stroke_len;
 	int moved_columns_count = 0;
 	int max_platform_y;
-	HPEN color_pen;
-	COLORREF bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
+	const AColor *color;
 
 	max_platform_y = (AsConfig::Max_Y_Pos + 1) * AsConfig::Global_Scale;
 
@@ -302,9 +288,9 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 		MoveToEx(hdc, x, y, 0);
 
 		// Рисуем последовательность вертикальных штрихов разного цвета (согласно прообразу, сохраненному в Normal_Platform_Image)
-		while (Get_Platform_Image_Stroke_Color(i, j, color_pen, stroke_len) )
+		while (Get_Platform_Image_Stroke_Color(i, j, &color, stroke_len) )
 		{
-			SelectObject(hdc, color_pen);
+			SelectObject(hdc, color->Pen);
 			LineTo(hdc, x, y + stroke_len);
 
 			y += stroke_len;
@@ -314,7 +300,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 		// Стираем фоном пиксели над штрихом
 		y = Meltdown_Platform_Y_Pos[i];
 		MoveToEx(hdc, x, y, 0);
-		SelectObject(hdc, AsConfig::BG_Pen);
+		SelectObject(hdc, AsConfig::BG_Color.Pen);
 		LineTo(hdc, x, y + y_offset);
 
 		Meltdown_Platform_Y_Pos[i] += y_offset;
@@ -336,8 +322,7 @@ void AsPlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
 	Clear_BG(hdc);
 
 	// 1. Рисуем шарик
-	SelectObject(hdc, Platform_Circle_Pen);
-	SelectObject(hdc, Platform_Circle_Brush);
+	Platform_Circle_Color.Select(hdc);
 
 	Ellipse(hdc, x, y, x + roller_size - 1, y + roller_size - 1);
 
@@ -353,9 +338,7 @@ void AsPlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
 	GetWorldTransform(hdc, &old_xform);
 	SetWorldTransform(hdc, &xform);
 
-	SelectObject(hdc, AsConfig::BG_Pen);
-	SelectObject(hdc, AsConfig::BG_Brush);
-
+	AsConfig::BG_Color.Select(hdc);
 	Rectangle(hdc, -AsConfig::Global_Scale / 2, -roller_size / 2, AsConfig::Global_Scale / 2, roller_size / 2);
 	// Rectangle(hdc, x + roller_size / 2 - 1, y, x + roller_size / 2 + 2, y + roller_size); мій варіант
 
@@ -399,7 +382,7 @@ bool AsPlatform::Reflect_From_Circle(double next_x_pos, double next_y_pos, doubl
 {
 	double distance, dx, dy;
 	double platform_circle_x, platform_circle_y, platform_circle_radius;
-	double two_radius;
+	double two_radiuses;
 	double alpha, beta, gamma;
 	double related_ball_direction;
 	const double pi_2 = 2.0 * M_PI;
@@ -415,10 +398,10 @@ bool AsPlatform::Reflect_From_Circle(double next_x_pos, double next_y_pos, doubl
 	dy = next_y_pos - platform_circle_y;
 
 	distance = sqrt(dx * dx + dy * dy);
-	two_radius = platform_circle_radius + ball->Radius;
+	two_radiuses = platform_circle_radius + ball->Radius;
 
 
-	if ( fabs(distance - two_radius) < AsConfig::Moving_Step_Size ) //fabs(distance - two_radius) < AsConfig::Moving_Step_Size   distance <= two_radius
+	if ( fabs(distance - two_radiuses) < AsConfig::Moving_Step_Size ) //fabs(distance - two_radiuses) < AsConfig::Moving_Step_Size   distance <= two_radiuses
 	{// ball touches platform circle
 
 		beta = atan2(-dy, dx);
@@ -446,11 +429,11 @@ bool AsPlatform::Reflect_From_Circle(double next_x_pos, double next_y_pos, doubl
 	return false;
 }
 //**************************************************************************************************************
-bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, HPEN &color_pen, int &stroke_len)
+bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, const AColor **color, int &stroke_len)
 {// Вычесляет длину и цвет очередного вертикального штриха в массиве Normal_Platform_Image
 	int i;
 	int cell = y * Normal_Platform_Image_Width + x;  // Позиция в массиве Normal_Platform_Image, соответствующая смещению (x, y)
-	int color;
+	int color_value;
 
 	stroke_len = 0;
 
@@ -461,12 +444,12 @@ bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, HPEN &color_pen, 
 	{
 		if (i == y)
 		{
-			color = Normal_Platform_Image[cell];
+			color_value = Normal_Platform_Image[cell];
 			stroke_len = 1;
 		}
 		else
 		{
-			if (color == Normal_Platform_Image[cell])
+			if (color_value == Normal_Platform_Image[cell])
 				++stroke_len;
 			else
 				break;
@@ -475,16 +458,16 @@ bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, HPEN &color_pen, 
 		cell += Normal_Platform_Image_Width; // переход на строку ниже
 	}
 
-	if (color == Highlight_Pen_Color.Get_RGB() )
-		color_pen = Highlight_Pen;
-	else if (color == Platform_Circle_Pen_Color.Get_RGB() )
-		color_pen = Platform_Circle_Pen;
-	else if (color == Platform_Inner_Pen_Color.Get_RGB() )
-		color_pen = Platform_Inner_Pen;
-	else if (color == AsConfig::BG_Color.Get_RGB() )
-		color_pen = AsConfig::BG_Pen;
+	if (color_value == Highlight_Color.Get_RGB() )
+		*color = &Highlight_Color;
+	else if (color_value == Platform_Circle_Color.Get_RGB() )
+		*color = &Platform_Circle_Color;
+	else if (color_value == Platform_Inner_Color.Get_RGB() )
+		*color = &Platform_Inner_Color;
+	else if (color_value == AsConfig::BG_Color.Get_RGB() )
+		*color = &AsConfig::BG_Color;
 	else
-		color_pen = 0;
+		throw 13;
 
 	return true;
 }

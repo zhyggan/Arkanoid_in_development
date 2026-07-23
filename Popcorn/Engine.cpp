@@ -23,9 +23,6 @@ void AsEngine::Init_Engine(HWND hwnd)
 	AActive_Brick_Red_Blue::Setup_Colors();
 
 	Level.Init();
-	Platform.Init();
-	Ball.Init();
-	Border.Init();
 
 	AFalling_Letter::Init();
 
@@ -44,7 +41,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 }
 //**************************************************************************************************************
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
-{//Отрисовка экрана игры
+{// Отрисовка экрана игры
 
 	SetGraphicsMode(hdc, GM_ADVANCED);
 

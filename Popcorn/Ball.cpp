@@ -37,15 +37,10 @@ int ABall::Hit_Checkers_Count = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};
 //**************************************************************************************************************
 ABall::ABall()
-	: Ball_State(EBS_Normal), Ball_Pen(0), Ball_Brush(0), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0), 
-	  Rest_Distance(0.0), Ball_Direction(0.0), Testing_Is_Active(false), Test_Itertation(0), Ball_Rect{}, Prev_Ball_Rect{}
+: Ball_State(EBS_Normal), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0),
+  Rest_Distance(0.0), Ball_Direction(0.0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}
 {
 	//Set_State(EBS_Normal, 0);
-}
-//**************************************************************************************************************
-void ABall::Init()
-{
-	AsConfig::Create_Pen_Brush(255, 255, 255, Ball_Pen, Ball_Brush);
 }
 //**************************************************************************************************************
 void ABall::Draw(HDC hdc, RECT &paint_area)
@@ -55,9 +50,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	//1. Очищаем фон
 	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) )
 	{
-		SelectObject(hdc, AsConfig::BG_Pen);
-		SelectObject(hdc, AsConfig::BG_Brush);
-
+		AsConfig::BG_Color.Select(hdc);
 		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
 	}
 
@@ -67,9 +60,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	//2. Рисуем шарик
 	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect) )
 	{
-		SelectObject(hdc, Ball_Pen);
-		SelectObject(hdc, Ball_Brush);
-
+		AsConfig::White_Color.Select(hdc);
 		Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right - 1, Ball_Rect.bottom - 1);
 	}
 }
@@ -125,21 +116,21 @@ void ABall::Set_For_Test()
 	Testing_Is_Active = true;
 	Rest_Test_Distance = 30.0;
 
-	//Set_State(EBS_Normal, 80, 189 - Test_Itertation);
+	//Set_State(EBS_Normal, 80, 189 - Test_Iteration);
 	//Ball_Direction = M_PI_4 / 4.0;
 	//Ball_Speed = 1.0;
 
-	//Set_State(EBS_Normal, 80 + Test_Itertation, 194);
+	//Set_State(EBS_Normal, 80 + Test_Iteration, 194);
 	//Ball_Direction = M_PI_4;
 
-	//Set_State(EBS_Normal, 100 - Test_Itertation, 194);
+	//Set_State(EBS_Normal, 100 - Test_Iteration, 194);
 	//Ball_Direction = M_PI - M_PI_4;
 
-	Set_State(EBS_Normal, 100 + Test_Itertation, 170);
+	Set_State(EBS_Normal, 100 + Test_Iteration, 170);
 	Ball_Direction = 5.0;
 	Ball_Speed = 1.0;
-	
-	++Test_Itertation;
+
+	++Test_Iteration;
 }
 //**************************************************************************************************************
 bool ABall::Is_Test_Finished()

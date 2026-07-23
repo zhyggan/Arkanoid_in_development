@@ -49,7 +49,7 @@ public:
 	const ELetter_Type Letter_Type;
 
 private:
-	void Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush);
+	void Set_Brick_Letter_Colors(bool is_switch_color, const AColor **front_color, const AColor **back_color);
 	void Draw_Brick_Letter(HDC hdc);
 	void Draw_Line(HDC hdc, int x_1, int y_1, int x_2, int y_2);
 	void Draw_Line_To(HDC hdc, int x, int y);
@@ -65,6 +65,6 @@ private:
 	static const int Brick_Half_Height = AsConfig::Brick_Height * AsConfig::Global_Scale / 2;
 
 	static int All_Letters_Popularity;
-	static int Letters_Popularity[ELT_Max]; // "Вес" каждой буквы
+	static int Letters_Popularity[ELT_Max];  // "Вес" каждой буквы
 };
 //**************************************************************************************************************
