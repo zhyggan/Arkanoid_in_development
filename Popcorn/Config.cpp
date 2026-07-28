@@ -14,6 +14,12 @@ AColor::AColor(unsigned char r, unsigned char g, unsigned char b)
 	Brush = CreateSolidBrush(RGB(r, g, b));
 }
 //**************************************************************************************************************
+AColor::AColor(const AColor &color, int pen_size)
+: R(color.R), G(color.G), B(color.B), Pen(0), Brush(0)
+{
+	Pen = CreatePen(PS_SOLID, pen_size, color.Get_RGB() );
+}
+//**************************************************************************************************************
 int AColor::Get_RGB() const
 {
 	return RGB(R, G, B);
@@ -25,7 +31,16 @@ void AColor::Select(HDC hdc) const
 	SelectObject(hdc, Brush);
 }
 //**************************************************************************************************************
-
+void AColor::Select_Pen(HDC hdc) const
+{
+	SelectObject(hdc, Pen);
+}
+//**************************************************************************************************************
+HBRUSH AColor::Get_Brush() const
+{
+	return Brush;
+}
+//**************************************************************************************************************
 
 
 
@@ -47,5 +62,12 @@ int AsConfig::Rand(int range)
 {// Вычисляет псевдослучайное число в диапазоне [0, .. range - 1]
 
 	return rand() * range / RAND_MAX; // (RAND_MAX + 1) чтобы не выйти за пределы массива
+}
+//**************************************************************************************************************
+void AsConfig::Round_Rect(HDC hdc, RECT &rect, int corner_radius)
+{
+	int radius = corner_radius * AsConfig::Global_Scale;
+
+	RoundRect(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1, radius, radius);
 }
 //**************************************************************************************************************

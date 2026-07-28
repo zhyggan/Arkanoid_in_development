@@ -200,7 +200,7 @@ void AsPlatform::Draw_Circle_Highlight(HDC hdc, int x, int y, bool is_roll_in)
 
 	if (is_roll_in == true)
 	{
-		SelectObject(hdc, Highlight_Color.Pen);
+		Highlight_Color.Select_Pen(hdc);
 
 		Arc(hdc, x + AsConfig::Global_Scale, y + AsConfig::Global_Scale, x + (Circle_Size - 1) * AsConfig::Global_Scale - 1, y + (Circle_Size - 1) * AsConfig::Global_Scale - 1,
 			x + 2 * AsConfig::Global_Scale, y + AsConfig::Global_Scale, x + AsConfig::Global_Scale, y + 3 * AsConfig::Global_Scale);
@@ -209,7 +209,7 @@ void AsPlatform::Draw_Circle_Highlight(HDC hdc, int x, int y, bool is_roll_in)
 	}
 	else
 	{
-		SelectObject(hdc, Highlight_Color.Pen);
+		Highlight_Color.Select_Pen(hdc);
 
 		Arc(hdc, x + AsConfig::Global_Scale, y + AsConfig::Global_Scale, x + (Circle_Size - 1) * AsConfig::Global_Scale - 1, y + (Circle_Size - 1) * AsConfig::Global_Scale - 1,
 			x + 2 * AsConfig::Global_Scale, y + AsConfig::Global_Scale, x + AsConfig::Global_Scale, y + 3 * AsConfig::Global_Scale);
@@ -226,6 +226,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	int cell = 0;
 	int x = X_Pos;
 	int y = AsConfig::Platform_Y_Pos;
+	RECT inner_rect;
 
 	Clear_BG(hdc);
 
@@ -241,7 +242,12 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 	// 3. Рисуем среднюю часть
 	Platform_Inner_Color.Select(hdc);
 
-	RoundRect(hdc, (x + 4) * AsConfig::Global_Scale, (y + 1) * AsConfig::Global_Scale, (x + 4 + Inner_Width - 1) * AsConfig::Global_Scale - 1, (y + 1 + 5) * AsConfig::Global_Scale - 1, 3 * AsConfig::Global_Scale, 3 * AsConfig::Global_Scale);
+	inner_rect.left = (x + 4) * AsConfig::Global_Scale;
+	inner_rect.top = (y + 1) * AsConfig::Global_Scale;
+	inner_rect.right = (x + 4 + Inner_Width - 1) * AsConfig::Global_Scale;
+	inner_rect.bottom = (y + 1 + 5) * AsConfig::Global_Scale;
+
+	AsConfig::Round_Rect(hdc, inner_rect, 3);
 
 	x *= AsConfig::Global_Scale;
 	y *= AsConfig::Global_Scale;
@@ -290,7 +296,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 		// Рисуем последовательность вертикальных штрихов разного цвета (согласно прообразу, сохраненному в Normal_Platform_Image)
 		while (Get_Platform_Image_Stroke_Color(i, j, &color, stroke_len) )
 		{
-			SelectObject(hdc, color->Pen);
+			color->Select_Pen(hdc);
 			LineTo(hdc, x, y + stroke_len);
 
 			y += stroke_len;
@@ -300,7 +306,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 		// Стираем фоном пиксели над штрихом
 		y = Meltdown_Platform_Y_Pos[i];
 		MoveToEx(hdc, x, y, 0);
-		SelectObject(hdc, AsConfig::BG_Color.Pen);
+		AsConfig::BG_Color.Select_Pen(hdc);
 		LineTo(hdc, x, y + y_offset);
 
 		Meltdown_Platform_Y_Pos[i] += y_offset;
