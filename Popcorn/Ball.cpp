@@ -114,21 +114,11 @@ void ABall::Move()
 void ABall::Set_For_Test()
 {
 	Testing_Is_Active = true;
-	Rest_Test_Distance = 30.0;
+	Rest_Test_Distance = 50.0;
 
-	//Set_State(EBS_Normal, 80, 189 - Test_Iteration);
-	//Ball_Direction = M_PI_4 / 4.0;
-	//Ball_Speed = 1.0;
-
-	//Set_State(EBS_Normal, 80 + Test_Iteration, 194);
-	//Ball_Direction = M_PI_4;
-
-	//Set_State(EBS_Normal, 100 - Test_Iteration, 194);
-	//Ball_Direction = M_PI - M_PI_4;
-
-	Set_State(EBS_Normal, 100 + Test_Iteration, 170);
-	Ball_Direction = 5.0;
-	Ball_Speed = 1.0;
+	Set_State(EBS_Normal, 130 + Test_Iteration, 90);
+	Ball_Direction = M_PI_4;
+	Ball_Speed = 3.0;
 
 	++Test_Iteration;
 }

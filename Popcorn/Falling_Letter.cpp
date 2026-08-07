@@ -220,7 +220,7 @@ void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 			xform.eM22 = (float)fabs(cos(rotation_angle) );
 			SetWorldTransform(hdc, &xform);
 
-			AsConfig::White_Color.Select_Pen(hdc);
+			AsConfig::Letter_Color.Select_Pen(hdc);
 
 			switch (Letter_Type)
 			{

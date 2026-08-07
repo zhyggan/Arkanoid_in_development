@@ -10,7 +10,7 @@ char AsLevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3,
+	2, 2, 2, 2, 2, 2, 2, 2, 7, 6, 5, 4,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -204,6 +204,19 @@ void AsLevel::On_Hit(int brick_x, int brick_y)
 	else
 		Add_Active_Brick(brick_x, brick_y, brick_type);
 
+	Redraw_Brick(brick_x, brick_y);
+}
+//**************************************************************************************************************
+void AsLevel::Redraw_Brick(int brick_x, int brick_y)
+{//
+	RECT brick_rect;
+
+	brick_rect.left = (AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
+	brick_rect.top = (AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
+	brick_rect.right = brick_rect.left + AsConfig::Brick_Width * AsConfig::Global_Scale;
+	brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height * AsConfig::Global_Scale;
+
+	InvalidateRect(AsConfig::Hwnd, &brick_rect, FALSE);
 }
 //**************************************************************************************************************
 bool AsLevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type)
@@ -246,7 +259,7 @@ void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
 {// Создаем активный кирпич, если можем
 
 	int i;
-	AActive_Brick *active_brick;
+	AActive_Brick *active_brick = 0;
 
 	if (Active_Bricks_Count >= AsConfig::Max_Active_Bricks_Count)
 		return; //too many active bricks!
@@ -266,8 +279,19 @@ void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
 		active_brick = new AActive_Brick_Unbreakable(brick_x, brick_y);
 		break;
 
+	case EBT_Multihit_1:
+		active_brick = new AActive_Brick_Multihit(brick_x, brick_y);
+		Current_Level[brick_y][brick_x] = EBT_None; // !!!!  without this line bricks won't disappear
+		break;
+
+	case EBT_Multihit_2:
+	case EBT_Multihit_3:
+	case EBT_Multihit_4:
+		Current_Level[brick_y][brick_x] = brick_type - 1;
+		break;
+
 	default:
-		throw 13;
+		AsConfig::Throw();
 	}
 
 	for (i = 0; i < AsConfig::Max_Active_Bricks_Count; i++)
@@ -360,8 +384,15 @@ void AsLevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 		AActive_Brick_Unbreakable::Draw_In_Level(hdc, brick_rect);
 		break;
 
+	case EBT_Multihit_1:
+	case EBT_Multihit_2:
+	case EBT_Multihit_3:
+	case EBT_Multihit_4:
+		AActive_Brick_Multihit::Draw_In_Level(hdc, brick_rect, brick_type);
+		break;
+
 	default:
-		throw 13;
+		AsConfig::Throw();
 	}
 }
 //**************************************************************************************************************
