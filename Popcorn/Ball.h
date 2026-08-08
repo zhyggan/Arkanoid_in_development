@@ -7,7 +7,8 @@ enum EBall_State
 {
 	EBS_Normal,
 	EBS_Lost,
-	EBS_On_Platform
+	EBS_On_Platform,
+	EBS_On_Parachute
 };
 //**************************************************************************************************************
 class ABall;
@@ -38,14 +39,13 @@ public:
 	void Set_For_Test();
 	bool Is_Test_Finished();
 	EBall_State Get_State();
-	void Set_State(EBall_State new_state, double x_pos, double y_pos = Start_Ball_Y_Pos);  // если в функции параметру присваивается значение, 
-																														// то в такую ф-ю можно передать два аргумента, а 3-му присвоится заданый
-																														// и записывается присваивание только в заголовочном файле			
+	void Set_State(EBall_State new_state, double x_pos, double y_pos = Start_Ball_Y_Pos);  // если в функции параметру присваивается значение, то в такую ф-ю можно передать два аргумента, а 3-му присвоится заданый и записывается присваивание только в заголовочном файле			
 	double Get_Direction();
 	void Set_Direction(double new_direction);
 	void Reflect(bool from_horizontal);
 	bool Is_Moving_Up();
 	bool Is_Moving_Left();
+	void Set_On_Parachute(int brick_x, int brick_y);
 
 	double Ball_Speed;
 
@@ -55,6 +55,7 @@ public:
 
 private:
 	void Redraw_Ball();
+	void Draw_Parachute(HDC hdc, RECT &paint_area);
 
 	EBall_State Ball_State;
 	double Rest_Distance;
@@ -67,8 +68,10 @@ private:
 	double Center_X_Pos, Center_Y_Pos;
 
 	RECT Ball_Rect, Prev_Ball_Rect;
+	RECT Parachute_Rect;
 
 	static const double Start_Ball_Y_Pos;
+	static const int Parachute_Size = 15;
 	static int Hit_Checkers_Count;
 	static AHit_Checker *Hit_Checkers[3];
 };
