@@ -202,10 +202,10 @@ void AsLevel::On_Hit(int brick_x, int brick_y, ABall *ball)
 	if (brick_type == EBT_Parachute)
 	{
 		ball->Set_On_Parachute(brick_x, brick_y);
-		Current_Level[brick_y][brick_x] = EBT_None; // !!!!  without this line bricks won't disappear
+		Current_Level[brick_y][brick_x] = EBT_None;
 	}
 	else if (Add_Falling_Letter(brick_x, brick_y, brick_type) )
-		Current_Level[brick_y][brick_x] = EBT_None; // !!!!  without this line bricks won't disappear
+		Current_Level[brick_y][brick_x] = EBT_None;
 	else
 		Add_Active_Brick(brick_x, brick_y, brick_type);
 
@@ -213,7 +213,7 @@ void AsLevel::On_Hit(int brick_x, int brick_y, ABall *ball)
 }
 //**************************************************************************************************************
 void AsLevel::Redraw_Brick(int brick_x, int brick_y)
-{//
+{
 	RECT brick_rect;
 
 	brick_rect.left = (AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
@@ -277,7 +277,7 @@ void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
 	case EBT_Red:
 	case EBT_Blue:
 		active_brick = new AActive_Brick_Red_Blue(brick_type, brick_x, brick_y);
-		Current_Level[brick_y][brick_x] = EBT_None; // !!!!  without this line bricks won't disappear
+		Current_Level[brick_y][brick_x] = EBT_None;
 		break;
 
 	case EBT_Unbreakable:
@@ -286,7 +286,7 @@ void AsLevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
 
 	case EBT_Multihit_1:
 		active_brick = new AActive_Brick_Multihit(brick_x, brick_y);
-		Current_Level[brick_y][brick_x] = EBT_None; // !!!!  without this line bricks won't disappear
+		Current_Level[brick_y][brick_x] = EBT_None;
 		break;
 
 	case EBT_Multihit_2:
