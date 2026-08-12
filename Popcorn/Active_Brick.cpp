@@ -143,8 +143,6 @@ void AActive_Brick_Red_Blue::Get_Fading_Color(const AColor &origin_color, int st
 
 
 // AActive_Brick_Unbreakable
-AColor AActive_Brick_Unbreakable::Blue_Highlight(AsConfig::Blue_Color, AsConfig::Global_Scale);
-AColor AActive_Brick_Unbreakable::Red_Highlight(AsConfig::Red_Color, 3 * AsConfig::Global_Scale);
 //**************************************************************************************************************
 AActive_Brick_Unbreakable::~AActive_Brick_Unbreakable()
 {
@@ -177,11 +175,11 @@ void AActive_Brick_Unbreakable::Draw(HDC hdc, RECT &paint_area)
 
 	offset = 2 * Animation_Step * scale - AsConfig::Brick_Width * scale;
 
-	Blue_Highlight.Select_Pen(hdc);
+	AsConfig::Unbreakable_Blue_Highlight.Select_Pen(hdc);
 	MoveToEx(hdc, Brick_Rect.left + 4 * scale + offset, Brick_Rect.bottom + scale, 0);
 	LineTo(hdc, Brick_Rect.left + 13 * scale + offset - 1, Brick_Rect.top - 1 * scale);
 
-	Red_Highlight.Select_Pen(hdc);
+	AsConfig::Unbreakable_Red_Highlight.Select_Pen(hdc);
 	MoveToEx(hdc, Brick_Rect.left + 6 * scale + offset, Brick_Rect.bottom + scale, 0);
 	LineTo(hdc, Brick_Rect.left + 15 * scale + offset - 1, Brick_Rect.top - 1 * scale);
 
@@ -338,5 +336,63 @@ void AActive_Brick_Multihit::Draw_Stage(HDC hdc, RECT &brick_rect, int x, int wi
 
 	AsConfig::Blue_Color.Select(hdc);
 	Rectangle(hdc, stage_rect.left, stage_rect.top, stage_rect.right - 1, stage_rect.bottom - 1);
+}
+//**************************************************************************************************************
+
+
+
+
+// AActive_Brick_Teleport
+//**************************************************************************************************************
+AActive_Brick_Teleport::~AActive_Brick_Teleport()
+{
+}
+//**************************************************************************************************************
+AActive_Brick_Teleport::AActive_Brick_Teleport(int level_x, int level_y, ABall *ball)
+: AActive_Brick(EBT_Teleport, level_x, level_y), Animation_Step(0), Ball(ball)
+{
+}
+//**************************************************************************************************************
+void AActive_Brick_Teleport::Act()
+{
+	//if (AsConfig::Current_Timer_Tick % 10 != 0)
+	//	return;
+
+	if (Animation_Step <= Max_Animation_Step)
+	{
+		++Animation_Step;
+		InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE);
+	}
+}
+//**************************************************************************************************************
+void AActive_Brick_Teleport::Draw(HDC hdc, RECT &paint_area)
+{
+	Draw_In_Level(hdc, Brick_Rect, Animation_Step);
+	Ball->Draw_Teleporting(hdc, Animation_Step);
+}
+//**************************************************************************************************************
+bool AActive_Brick_Teleport::Is_Finished()
+{
+	if (Animation_Step >= Max_Animation_Step)
+		return true;
+	else
+		return false;
+}
+//**************************************************************************************************************
+void AActive_Brick_Teleport::Draw_In_Level(HDC hdc, RECT &brick_rect, int step)
+{// Вывод неактивного кирпича на уровне
+
+	const int scale = AsConfig::Global_Scale;
+
+	int top_y = brick_rect.top + step / 2 + 1;
+	int low_y = brick_rect.bottom - scale - step / 2 + 1;
+
+	// Фон
+	AsConfig::Red_Color.Select(hdc);
+	AsConfig::Round_Rect(hdc, brick_rect);
+
+	// Портал
+	AsConfig::Teleport_Portal_Color.Select(hdc);
+	Ellipse(hdc, brick_rect.left + 3 * scale + 1, top_y, brick_rect.left + 11 * scale + 1, low_y);
 }
 //**************************************************************************************************************

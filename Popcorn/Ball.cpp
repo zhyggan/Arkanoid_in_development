@@ -47,14 +47,17 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	//1. Очищаем фон
+	if ( (Ball_State == EBS_Teleporting || Ball_State == EBS_Lost) && Ball_State == Prev_Ball_State)
+		return;
+
+	// 1. Очищаем фон
 	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) )
 	{
 		AsConfig::BG_Color.Select(hdc);
 		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
 	}
 
-	switch(Ball_State)
+	switch (Ball_State)
 	{
 	case EBS_On_Parachute:
 		Draw_Parachute(hdc, paint_area);
@@ -69,14 +72,29 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 		if (Prev_Ball_State == EBS_On_Parachute)
 			Clear_Parachute(hdc);
 		return;
+
+	case EBS_Teleporting:
+		return;
 	}
 
-	//2. Рисуем шарик
+	// 2. Рисуем шарик
 	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect) )
 	{
 		AsConfig::White_Color.Select(hdc);
 		Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right - 1, Ball_Rect.bottom - 1);
 	}
+}
+//**************************************************************************************************************
+void ABall::Draw_Teleporting(HDC hdc, int step)
+{
+	int top_y = Ball_Rect.top + step / 2;
+	int low_y = Ball_Rect.bottom - step / 2 - 1;
+
+	if (top_y >= low_y)
+		return;
+
+	AsConfig::White_Color.Select(hdc);
+	Ellipse(hdc, Ball_Rect.left, top_y, Ball_Rect.right - 1, low_y);
 }
 //**************************************************************************************************************
 void ABall::Move()
@@ -85,7 +103,7 @@ void ABall::Move()
 	bool got_hit;
 	double next_x_pos, next_y_pos;
 
-	if (Ball_State == EBS_Lost || Ball_State == EBS_On_Platform)
+	if (Ball_State == EBS_Lost || Ball_State == EBS_On_Platform || Ball_State == EBS_Teleporting)
 		return;
 
 	Prev_Ball_Rect = Ball_Rect;
@@ -124,11 +142,11 @@ void ABall::Move()
 		if (Ball_State == EBS_Lost)
 			break;
 	}
-	
+
 	Redraw_Ball();
 
 	if (Ball_State == EBS_On_Parachute)
-	{ 
+	{
 		Prev_Parachute_Rect = Parachute_Rect;
 
 		Parachute_Rect.bottom = Ball_Rect.bottom;
@@ -188,7 +206,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos) // ес
 
 	case EBS_Lost:
 		if (! (Ball_State == EBS_Normal || Ball_State == EBS_On_Parachute) )
-			AsConfig::Throw();
+			AsConfig::Throw();  // Только из этих состояний можно потерять мячик!
 
 		Ball_Speed = 0.0;
 		Redraw_Ball();
@@ -213,13 +231,32 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos) // ес
 
 	case EBS_Off_Parachute:
 		if (Ball_State != EBS_On_Parachute)
-			AsConfig::Throw();
+			AsConfig::Throw();  // В это состояние можно перейти только из EBS_On_Parachute!
 
 		Ball_Speed = 0.0;
 		Rest_Distance = 0.0;
 		Redraw_Ball();
 		Redraw_Parachute();
 		break;
+
+
+	case EBS_Teleporting:
+		if (! (Ball_State == EBS_Normal || Ball_State == EBS_On_Parachute) )
+			AsConfig::Throw();  // Только из этих состояний можно войти в телепорт!
+
+		Center_X_Pos = x_pos;
+		Center_Y_Pos = y_pos;
+		Ball_Speed = 0.0;
+		Rest_Distance = 0.0;
+		Redraw_Ball();
+
+		if (Ball_State == EBS_On_Parachute)
+			Redraw_Parachute();
+		break;
+
+
+	default:
+		AsConfig::Throw();
 	}
 
 	Prev_Ball_State = Ball_State;

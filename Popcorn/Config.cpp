@@ -61,6 +61,9 @@ const AColor AsConfig::Red_Color(255, 85, 85);
 const AColor AsConfig::Blue_Color(85, 255, 255);
 const AColor AsConfig::White_Color(255, 255, 255);
 const AColor AsConfig::Letter_Color(AsConfig::White_Color, AsConfig::Global_Scale);
+const AColor AsConfig::Unbreakable_Blue_Highlight(AsConfig::Blue_Color, AsConfig::Global_Scale);
+const AColor AsConfig::Unbreakable_Red_Highlight(AsConfig::Red_Color, 3 * AsConfig::Global_Scale);
+const AColor AsConfig::Teleport_Portal_Color(AsConfig::Blue_Color, AsConfig::BG_Color, AsConfig::Global_Scale);
 
 HWND AsConfig::Hwnd;
 
