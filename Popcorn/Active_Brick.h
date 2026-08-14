@@ -36,6 +36,7 @@ protected:
 	AActive_Brick(EBrick_Type brick_type, int level_x, int level_y);
 
 	EBrick_Type Brick_Type;
+	int Level_X, Level_Y;
 	RECT Brick_Rect;
 };
 //**************************************************************************************************************
@@ -104,11 +105,18 @@ private:
 	static const int Max_Rotation_Step = Steps_Per_Turn * 4;
 };
 //**************************************************************************************************************
+enum ETeleport_State
+{
+	ETS_Starting,
+	ETS_Finishing,
+	ETS_Done
+};
+//**************************************************************************************************************
 class AActive_Brick_Teleport: public AActive_Brick
 {
 public:
 	~AActive_Brick_Teleport();
-	AActive_Brick_Teleport(int level_x, int level_y, ABall *ball);
+	AActive_Brick_Teleport(int level_x, int level_y, ABall *ball, AActive_Brick_Teleport *destination_teleport);
 
 	virtual void Act();
 	virtual void Draw(HDC hdc, RECT &paint_area);
@@ -117,8 +125,12 @@ public:
 	static void Draw_In_Level(HDC hdc, RECT &brick_rect, int step = 0);
 
 private:
+	void Set_Ball(ABall *ball);
+
+	ETeleport_State Teleport_State;
 	int Animation_Step;
 	ABall *Ball;
+	AActive_Brick_Teleport *Destination_Teleport;
 
 	static const int Max_Animation_Step = 12;
 };
