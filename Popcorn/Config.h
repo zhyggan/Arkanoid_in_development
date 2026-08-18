@@ -57,7 +57,7 @@ public:
 	static const int Platform_Y_Pos = 185;
 	static const int FPS = 20;
 	static const int Max_Active_Bricks_Count = 10;
-	static const int Hits_Per_Letter = 10;  // Вероятность выбить букву = 1.0 / Hits_Per_Letter
+	static const int Hits_Per_Letter = 1;  // Вероятность выбить букву = 1.0 / Hits_Per_Letter
 	static const int Max_Falling_Letters_Count = 10;
 };
 //**************************************************************************************************************

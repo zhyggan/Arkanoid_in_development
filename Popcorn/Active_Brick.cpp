@@ -31,6 +31,10 @@ AActive_Brick::AActive_Brick(EBrick_Type brick_type, int level_x, int level_y)
 	Brick_Rect.bottom = Brick_Rect.top + AsConfig::Brick_Height * AsConfig::Global_Scale;
 }
 //**************************************************************************************************************
+void AActive_Brick::Clear(HDC hdc, RECT &paint_area)
+{
+}
+//**************************************************************************************************************
 double AActive_Brick::Get_Brick_X_Pos(bool of_center)
 {
 	double pos = (double)(AsConfig::Level_X_Offset + Level_X * AsConfig::Cell_Width);
@@ -512,5 +516,112 @@ void AActive_Brick_Teleport::Set_Ball(ABall *ball)
 		ball->Set_State(EBS_Teleporting, ball_x, ball_y);
 
 	Ball = ball;
+}
+//**************************************************************************************************************
+
+
+
+
+// AAdvertisement
+//**************************************************************************************************************
+AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
+: Level_X(level_x), Level_Y(level_y), Width(width), Height(height)
+{
+}
+//**************************************************************************************************************
+void AAdvertisement::Act()
+{
+}
+//**************************************************************************************************************
+void AAdvertisement::Clear(HDC hdc, RECT &paint_area)
+{
+}
+//**************************************************************************************************************
+void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
+{
+	// 1. Шарик
+	// 1.1. Красный эллипс 12х12
+	// 1.2. Блик сверху
+	// 1.3. Летает вверх/вниз (по затухающей траектории)
+	// 1.4. Сплющивается внизу до 16х9
+
+	// 2. Тень под шариком
+	// 2.1. Синий эллип 8х6, пока шарик полностью над "столом"
+	// 2.2. Уезжает вниз, когда шарик в верхней точке
+	// 2.3. Увеличивается, когда шарик плющится
+
+	// 3. Стол
+	// 3.1. Белая поверхность
+	// 3.2. Синяя кайма толщиной в 1 игровой пиксель
+	// 3.3. Красный борт толщиной в 1 игровой пиксель
+
+	// 4. Рамка
+	// 4.1. Тонкая синяя рамка со скруглёнными краями
+}
+//**************************************************************************************************************
+bool AAdvertisement::Is_Finished()
+{
+	return false;  // Реклама не заканчивается никогда! ;-)
+}
+//**************************************************************************************************************
+
+
+
+
+// AActive_Brick_Ad
+//**************************************************************************************************************
+AActive_Brick_Ad::~AActive_Brick_Ad()
+{
+	//DeleteObject(Region);
+}
+//**************************************************************************************************************
+AActive_Brick_Ad::AActive_Brick_Ad(int level_x, int level_y)
+: AActive_Brick(EBT_Unbreakable, level_x, level_y)//, Animation_Step(0), Region(0)
+{
+	//Region = CreateRoundRectRgn(Brick_Rect.left, Brick_Rect.top, Brick_Rect.right + 1, Brick_Rect.bottom + 1, 2 * AsConfig::Global_Scale - 1, 2 * AsConfig::Global_Scale - 1);
+}
+//**************************************************************************************************************
+void AActive_Brick_Ad::Act()
+{
+	//if (Animation_Step <= Max_Animation_Step)
+	//{
+	//	++Animation_Step;
+		InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE);
+	//}
+}
+//**************************************************************************************************************
+void AActive_Brick_Ad::Draw(HDC hdc, RECT &paint_area)
+{
+	
+}
+//**************************************************************************************************************
+bool AActive_Brick_Ad::Is_Finished()
+{
+//	if (Animation_Step >= Max_Animation_Step)
+//		return true;
+//	else
+		return false;
+}
+//**************************************************************************************************************
+void AActive_Brick_Ad::Draw_In_Level(HDC hdc, RECT &brick_rect)
+{// Вывод неактивного кирпича на уровне
+
+	int i;
+	int x = brick_rect.left;
+	int y = brick_rect.top;
+	const int scale = AsConfig::Global_Scale;
+	int size = (Circle_Size - 1) * scale - 1;
+
+	for (i = 0; i < 2; i++)
+	{
+		AsConfig::Red_Color.Select(hdc);
+		Ellipse(hdc, x, y, x + Circle_Size * scale, brick_rect.bottom);
+
+		AsConfig::White_Color.Select(hdc);
+
+		Arc(hdc, x + scale, y + scale, x + size, y + size,  x + 2 * scale, y + scale, x + scale, y + 3 * scale);
+
+		x += 8 * scale;
+	}
 }
 //**************************************************************************************************************
