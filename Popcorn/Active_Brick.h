@@ -167,6 +167,8 @@ public:
 private:
 	int Level_X, Level_Y;
 	int Width, Height;
+
+	RECT Ad_Rect;
 };
 //**************************************************************************************************************
 class AActive_Brick_Ad: public AActive_Brick

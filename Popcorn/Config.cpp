@@ -10,14 +10,20 @@ AColor::AColor()
 AColor::AColor(unsigned char r, unsigned char g, unsigned char b)
 : R(r), G(g), B(b), Pen(0), Brush(0)
 {
-	Pen = CreatePen(PS_SOLID, 0, RGB(r, g, b));
-	Brush = CreateSolidBrush(RGB(r, g, b));
+	Pen = CreatePen(PS_SOLID, 0, RGB(r, g, b) );
+	Brush = CreateSolidBrush(RGB(r, g, b) );
 }
 //**************************************************************************************************************
 AColor::AColor(const AColor &color, int pen_size)
 : R(color.R), G(color.G), B(color.B), Pen(0), Brush(0)
 {
 	Pen = CreatePen(PS_SOLID, pen_size, color.Get_RGB() );
+}
+//**************************************************************************************************************
+AColor::AColor(unsigned char r, unsigned char g, unsigned char b, int pen_size)
+	: R(r), G(g), B(b), Pen(0)
+{
+	Pen = CreatePen(PS_SOLID, pen_size, RGB(r, g, b) );
 }
 //**************************************************************************************************************
 AColor::AColor(const AColor &pen_color, const AColor &brush_color, int pen_size)
@@ -64,6 +70,8 @@ const AColor AsConfig::Letter_Color(AsConfig::White_Color, AsConfig::Global_Scal
 const AColor AsConfig::Unbreakable_Blue_Highlight(AsConfig::Blue_Color, AsConfig::Global_Scale);
 const AColor AsConfig::Unbreakable_Red_Highlight(AsConfig::Red_Color, 3 * AsConfig::Global_Scale);
 const AColor AsConfig::Teleport_Portal_Color(AsConfig::Blue_Color, AsConfig::BG_Color, AsConfig::Global_Scale);
+const AColor AsConfig::Advertisement_Blue_Table(0, 159, 159, AsConfig::Global_Scale);
+const AColor AsConfig::Advertisement_Red_Table(AsConfig::Red_Color, 2 * AsConfig::Global_Scale);
 
 HWND AsConfig::Hwnd;
 

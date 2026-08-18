@@ -527,6 +527,10 @@ void AActive_Brick_Teleport::Set_Ball(ABall *ball)
 AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
 : Level_X(level_x), Level_Y(level_y), Width(width), Height(height)
 {
+	Ad_Rect.left = (AsConfig::Level_X_Offset + Level_X * AsConfig::Cell_Width) * AsConfig::Global_Scale;
+	Ad_Rect.top = (AsConfig::Level_Y_Offset + Level_Y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
+	Ad_Rect.right = Ad_Rect.left + Width * AsConfig::Cell_Width * AsConfig::Global_Scale;
+	Ad_Rect.bottom = Ad_Rect.top + Height * AsConfig::Cell_Height * AsConfig::Global_Scale;
 }
 //**************************************************************************************************************
 void AAdvertisement::Act()
@@ -539,24 +543,60 @@ void AAdvertisement::Clear(HDC hdc, RECT &paint_area)
 //**************************************************************************************************************
 void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 {
-	// 1. Шарик
-	// 1.1. Красный эллипс 12х12
-	// 1.2. Блик сверху
-	// 1.3. Летает вверх/вниз (по затухающей траектории)
-	// 1.4. Сплющивается внизу до 16х9
+	const int scale = AsConfig::Global_Scale;
+	RECT intersection_rect;
+
+	
+	if (! IntersectRect(&intersection_rect, &paint_area, &Ad_Rect) )
+		return;
+
+	// 1. Стол
+	// 1.1. Белая поверхность
+	AsConfig::White_Color.Select(hdc);
+	MoveToEx(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale, 0);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale);
+	LineTo(hdc, Ad_Rect.left + 30 * scale + 1, Ad_Rect.top + 15 * scale);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale);
+	LineTo(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale);
+
+	FloodFill(hdc, Ad_Rect.left + 15 * scale, Ad_Rect.top + 15 * scale, AsConfig::White_Color.Get_RGB() );
 
 	// 2. Тень под шариком
 	// 2.1. Синий эллип 8х6, пока шарик полностью над "столом"
+	AsConfig::Blue_Color.Select(hdc);
+	Ellipse (hdc, Ad_Rect.left + 11 * scale, Ad_Rect.top + 14 * scale, Ad_Rect.left + 20 * scale - 1, Ad_Rect.top + 18 * scale - 1);
+
 	// 2.2. Уезжает вниз, когда шарик в верхней точке
 	// 2.3. Увеличивается, когда шарик плющится
+	
 
-	// 3. Стол
-	// 3.1. Белая поверхность
+	// 3.table borders
 	// 3.2. Синяя кайма толщиной в 1 игровой пиксель
+	AsConfig::Advertisement_Blue_Table.Select(hdc);
+	MoveToEx(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale, 0);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 10 * scale);
+	LineTo(hdc, Ad_Rect.left + 30 * scale + 1, Ad_Rect.top + 15 * scale);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 20 * scale);
+	LineTo(hdc, Ad_Rect.left + 1, Ad_Rect.top + 15 * scale);
+	
 	// 3.3. Красный борт толщиной в 1 игровой пиксель
+	AsConfig::Advertisement_Red_Table.Select(hdc);
+	MoveToEx(hdc, Ad_Rect.left + scale - 1, Ad_Rect.top + 16 * scale, 0);
+	LineTo(hdc, Ad_Rect.left + 15 * scale + 1, Ad_Rect.top + 21 * scale);
+	LineTo(hdc, Ad_Rect.left + 30 * scale, Ad_Rect.top + 16 * scale);
 
-	// 4. Рамка
-	// 4.1. Тонкая синяя рамка со скруглёнными краями
+
+	// 4. Шарик
+	// 4.1. Красный эллипс 12х12
+	AsConfig::Red_Color.Select(hdc);
+	Ellipse (hdc, Ad_Rect.left + 9 * scale + 1, Ad_Rect.top + 2 * scale, Ad_Rect.left + 21 * scale + 1, Ad_Rect.top + 14 * scale);
+	// 4.2. Блик сверху
+	// 4.3. Летает вверх/вниз (по затухающей траектории)
+	// 4.4. Сплющивается внизу до 16х9
+
+
+	// 5. Рамка
+	// 5.1. Тонкая синяя рамка со скруглёнными краями
 }
 //**************************************************************************************************************
 bool AAdvertisement::Is_Finished()
